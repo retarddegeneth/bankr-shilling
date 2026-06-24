@@ -1,0 +1,144 @@
+<!doctype html>
+<title>Payouts — Bankr Shill Terminal</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+:root{--bg:#030506;--panel:#0a0f0d;--accent:#00ff9d;--accent2:#78ffd6;--muted:#5a7a72;--text:#c9f0d8;--border:#1a3a2f;--err:#ff4d6a;--warn:#f2b518;--ok:#3fb950;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Courier New",Courier,monospace;font-size:15px;line-height:1.55}
+.wrap{max-width:1140px;margin:0 auto;padding:22px}
+.prompt{color:var(--accent);font-weight:700}
+.cmd{color:var(--accent2)}
+.dim{color:var(--muted)}
+a{color:var(--accent2);text-decoration:underline}
+nav{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px;text-transform:uppercase;letter-spacing:.15em}
+input[type=date],input[type=number],input[type=text]{background:#050a08;color:var(--accent2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px}
+.form{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.form>div{display:flex;flex-direction:column;gap:6px}
+button{background:#05220e;color:var(--accent);border:1px solid #1f7a4a;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-size:13px}
+button:hover{background:#0a3318;box-shadow:0 0 0 2px rgba(0,255,157,.25)}
+button.danger{background:#2a1010;color:var(--err);border-color:#5a1d2a}
+button.danger:hover{background:#3a1818}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #143028}
+th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.15em}
+.termline{white-space:nowrap;overflow:hidden}
+.alert{padding:10px 12px;border-radius:8px;margin-bottom:12px;border:1px solid}
+.alert.error{background:#1f080e;color:#ffb3bf;border-color:#5a1d2a}
+.alert.ok{background:#081f14;color:#a3f0b5;border-color:#1f5a35}
+</style>
+<div class="wrap">
+  <nav>
+    <a href="/bankr-shilling/"><span class="prompt">~/leaderboard</span></a>
+    <a href="/bankr-shilling/#tweets"><span class="prompt">~/tweets</span></a>
+    <a href="/bankr-shilling/payments.html"><span class="prompt">~/payments (read)</span></a>
+  </nav>
+  <div class="card">
+    <div class="termline"><span class="prompt">admin@bankr-shill</span><span class="dim">:</span><span class="cmd">~</span><span class="dim">$</span> <span class="cmd">manual_payout --superuser</span></div>
+    <form id="payoutForm" style="margin-top:12px">
+      <div class="form">
+        <div><label>date</label><input type="date" id="date" required/></div>
+        <div><label>rank 1-10</label><input type="number" id="rank" min="1" max="10" required style="width:110px"/></div>
+        <div><label>handle</label><input id="handle" placeholder="@handle" required style="width:170px"/></div>
+        <div><label>amount usd</label><input type="number" step="0.01" id="amount" placeholder="0.00" required style="width:130px"/></div>
+        <div style="flex:1;min-width:220px"><label>note</label><input id="note" placeholder="optional" style="width:100%"/></div>
+      </div>
+      <button type="submit" style="margin-top:10px">[ append payout ]</button>
+      <button type="button" class="danger" id="exportBtn" style="margin-top:10px;margin-left:8px">[ download updated payouts.json ]</button>
+    </form>
+    <p class="dim" style="margin-top:8px">this admin page updates local内存 only. download the JSON and commit it to the repo to publish.</p>
+  </div>
+  <div class="card">
+    <div class="termline"><span class="prompt">admin@bankr-shill</span><span class="dim">:</span><span class="cmd">~</span><span class="dim">$</span> <span class="cmd">tail -n 20 payout_history.log</span></div>
+    <table style="margin-top:10px">
+      <thead>
+        <tr><th>date</th><th>rank</th><th>shiller</th><th>amount usd</th><th>note</th></tr>
+      </thead>
+      <tbody id="payoutsBody">
+        <tr><td colspan="5" class="dim" style="text-align:center;padding:18px">loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+let payouts = [];
+const LS_KEY = 'bankr_payouts_admin_v1';
+
+async function loadRemote() {
+  try {
+    const res = await fetch('/bankr-shilling/payouts.json?t=' + Date.now());
+    const data = await res.json();
+    payouts = data.payouts || [];
+    localStorage.setItem(LS_KEY, JSON.stringify(payouts));
+  } catch(e) {
+    const raw = localStorage.getItem(LS_KEY);
+    payouts = raw ? JSON.parse(raw) : [];
+  }
+  render();
+}
+
+function saveLocal(updated) {
+  payouts = updated;
+  localStorage.setItem(LS_KEY, JSON.stringify(payouts));
+  render();
+}
+
+function render() {
+  const tw = document.getElementById('payoutsBody');
+  if (!payouts.length) {
+    tw.innerHTML = `<tr><td colspan="5" class="dim" style="text-align:center;padding:18px">no payouts yet.</td></tr>`;
+    return;
+  }
+  payouts.sort((a,b) => b.date.localeCompare(a.date) || a.rank - b.rank);
+  tw.innerHTML = payouts.map((p,i) => `
+    <tr>
+      <td>${p.date}</td>
+      <td>${p.rank}</td>
+      <td>@${p.handle}</td>
+      <td>$${parseFloat(p.amount).toFixed(2)}</td>
+      <td class="dim">${p.note || ''}</td>
+      <td><button class="danger" onclick="remove(${i})" style="padding:4px 8px;font-size:11px">[x]</button></td>
+    </tr>
+  `).join('');
+}
+
+function remove(i) {
+  if (!confirm('remove this payout?')) return;
+  const updated = payouts.filter((_, idx) => idx !== i);
+  saveLocal(updated);
+}
+
+document.getElementById('payoutForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const payout = {
+    date: document.getElementById('date').value,
+    rank: parseInt(document.getElementById('rank').value, 10),
+    handle: document.getElementById('handle').value.trim().replace(/^@/,''),
+    amount: parseFloat(document.getElementById('amount').value || '0'),
+    note: document.getElementById('note').value.trim()
+  };
+  if (!payout.date || !payout.rank || !payout.handle || !payout.amount) {
+    alert('date, rank, handle, and amount are required', 'error'); return;
+  }
+  const updated = [...payouts, payout];
+  saveLocal(updated);
+  e.target.reset();
+  document.getElementById('date').value = new Date().toISOString().slice(0,10);
+});
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({ lastUpdated: new Date().toISOString(), payouts }, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'payouts.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('date').value = new Date().toISOString().slice(0,10);
+loadRemote();
+</script>

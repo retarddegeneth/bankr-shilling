@@ -1,5 +1,5 @@
 <!doctype html>
-<title>Payouts — Bankr Shill Terminal</title>
+<title>Payments — Bankr Shill Terminal</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <style>
@@ -22,18 +22,46 @@ th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;le
   <nav>
     <a href="/bankr-shilling/"><span class="prompt">~/leaderboard</span></a>
     <a href="/bankr-shilling/#tweets"><span class="prompt">~/tweets</span></a>
-    <a href="/bankr-shilling/#payments"><span class="prompt">~/payments</span></a>
+    <a href="/bankr-shilling/admin.html"><span class="prompt">~/admin</span></a>
   </nav>
   <div class="card">
     <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="cmd">~</span><span class="dim">$</span> <span class="cmd">cat payout_history.log</span></div>
-    <p class="dim" style="margin-top:10px">daily payout history — top 10 shillers. manually verified.</p>
+    <p class="dim" style="margin-top:10px">daily payout history — top 10 shillers. read-only.</p>
     <table>
       <thead>
         <tr><th>date</th><th>rank</th><th>shiller</th><th>amount usd</th><th>note</th></tr>
       </thead>
       <tbody id="payoutsBody">
-        <tr><td colspan="5" class="dim" style="text-align:center;padding:18px">no payouts yet.</td></tr>
+        <tr><td colspan="5" class="dim" style="text-align:center;padding:18px">loading...</td></tr>
       </tbody>
     </table>
   </div>
 </div>
+
+<script>
+async function load() {
+  try {
+    const res = await fetch('/bankr-shilling/payouts.json?t=' + Date.now());
+    const data = await res.json();
+    const payouts = data.payouts || [];
+    const tw = document.getElementById('payoutsBody');
+    if (!payouts.length) {
+      tw.innerHTML = `<tr><td colspan="5" class="dim" style="text-align:center;padding:18px">no payouts yet.</td></tr>`;
+      return;
+    }
+    payouts.sort((a,b) => b.date.localeCompare(a.date) || a.rank - b.rank);
+    tw.innerHTML = payouts.map(p => `
+      <tr>
+        <td>${p.date}</td>
+        <td>${p.rank}</td>
+        <td>@${p.handle}</td>
+        <td>$${parseFloat(p.amount).toFixed(2)}</td>
+        <td class="dim">${p.note || ''}</td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    document.getElementById('payoutsBody').innerHTML = `<tr><td colspan="5" class="dim" style="text-align:center;padding:18px">failed to load.</td></tr>`;
+  }
+}
+load();
+</script>
