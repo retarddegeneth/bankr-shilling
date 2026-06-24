@@ -40,7 +40,7 @@ th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;le
     <p class="dim" style="margin-top:8px">this dashboard is local-only. use edit + download to publish payouts.json.</p>
   </div>
 
-  <div class="card" id="leaderboardCard">
+  <div class="card">
     <div class="termline"><span class="prompt">admin@bankr-shill</span><span class="dim">:</span><span class="cmd">~</span><span class="dim">$</span> <span class="cmd">rank --top=10</span></div>
     <table style="margin-top:10px">
       <thead>
@@ -53,7 +53,6 @@ th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;le
   </div>
 
   <div class="card">
-    <div class="termline"><span class="prompt">admin@bankr-shill</span><span class="dim">:</span><span class="cmd">~</span><span class="dim">$</span> <span class="cmd">manual_payout --config</span></div>
     <form id="payoutForm" style="margin-top:12px">
       <div class="form">
         <div><label>date</label><input type="date" id="date" required/></div>
