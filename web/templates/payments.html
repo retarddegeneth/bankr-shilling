@@ -1,0 +1,63 @@
+<!doctype html>
+<title>Payments — Bankr Shill Terminal</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+:root{--bg:#030506;--panel:#0a0f0d;--accent:#00ff9d;--accent2:#78ffd6;--muted:#5a7a72;--text:#c9f0d8;--border:#1a3a2f;--err:#ff4d6a;--warn:#f2b518;--ok:#3fb950;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Courier New",Courier,monospace;font-size:15px;line-height:1.55}
+.wrap{max-width:1140px;margin:0 auto;padding:22px}
+.prompt{color:var(--accent);font-weight:700}
+.cmd{color:var(--accent2)}
+.dim{color:var(--muted)}
+a{color:var(--accent2);text-decoration:underline}
+nav{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px;text-transform:uppercase;letter-spacing:.15em}
+input[type=date],input[type=number],input[type=text]{background:#050a08;color:var(--accent2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px}
+.form{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.form>div{display:flex;flex-direction:column;gap:6px}
+button{background:#05220e;color:var(--accent);border:1px solid #1f7a4a;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-size:13px}
+button:hover{background:#0a3318;box-shadow:0 0 0 2px rgba(0,255,157,.25)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #143028}
+th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.15em}
+</style>
+<div class="wrap">
+  <nav>
+    <a href="/"><span class="prompt">~/leaderboard</span></a>
+    <a href="/tweets"><span class="prompt">~/tweets</span></a>
+    <a href="/payments"><span class="prompt">~/payments</span></a>
+  </nav>
+  <div class="card">
+    <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="cmd">~</span><span class="dim">$</span> <span class="cmd">manual_payout --config</span></div>
+    <form class="form" method="post" action="/payments/manual" id="payoutForm" style="margin-top:12px">
+      <div><label>date</label><input type="date" name="date" required value="{{ today }}"/></div>
+      <div><label>rank 1-10</label><input type="number" name="rank" min="1" max="10" required style="width:110px"/></div>
+      <div><label>handle</label><input type="text" name="handle" placeholder="@handle" required style="width:170px"/></div>
+      <div><label>amount usd</label><input type="number" step="0.01" name="amount" placeholder="0.00" required style="width:120px"/></div>
+      <div style="flex:1;min-width:200px"><label>note</label><input type="text" name="note" placeholder="optional" style="width:100%"/></div>
+      <button type="submit">[ save payout ]</button>
+    </form>
+  </div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th>date</th><th>rank</th><th>shiller</th><th>amount usd</th><th>note</th></tr>
+      </thead>
+      <tbody>
+        {% for p in payouts %}
+          <tr>
+            <td>{{ p.payout_date }}</td>
+            <td>{{ p.rank }}</td>
+            <td>@{{ p.x_handle }}</td>
+            <td>{{ "%.2f"|format(p.amount_usd) }}</td>
+            <td class="dim">{{ p.note or '' }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="dim" style="text-align:center;padding:18px">no payouts yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

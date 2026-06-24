@@ -1,0 +1,343 @@
+<!doctype html>
+<title>Bankr Shill Terminal v1.0</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+:root{--bg:#030506;--panel:#0a0f0d;--accent:#00ff9d;--accent2:#78ffd6;--muted:#5a7a72;--text:#c9f0d8;--border:#1a3a2f;--err:#ff4d6a;--warn:#f2b518;--ok:#3fb950;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Courier New",Courier,monospace;font-size:15px;line-height:1.55}
+.wrap{max-width:1140px;margin:0 auto;padding:22px}
+.term{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:14px;position:relative;box-shadow:0 0 0 1px #0f1f18 inset}
+.term::before{content:"";position:absolute;top:0;left:0;right:0;height:28px;background:#0e1a16;border-bottom:1px solid var(--border);border-radius:8px 8px 0 0}
+.term::after{content:"● ● ●";position:absolute;top:5px;left:12px;color:#2a5a4a;font-size:11px;letter-spacing:2px}
+h1{font-size:16px;margin:0;color:var(--accent);font-weight:700}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.brand img{height:40px;width:40px;image-rendering:pixelated;filter:drop-shadow(0 0 8px rgba(0,255,157,.35))}
+.prompt{color:var(--accent);font-weight:700}
+.cmd{color:var(--accent2)}
+.bright{color:#fff;text-shadow:0 0 6px rgba(0,255,157,.25)}
+.dim{color:var(--muted)}
+.err{color:var(--err)}
+.warn{color:var(--warn)}
+.ok{color:var(--ok)}
+a{color:var(--accent2);text-decoration:underline}
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:960px){.grid{grid-template-columns:380px 1fr}}
+.card{background:#0a0f0d;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.banner{background:#081f18;border:1px solid #1f5f44;border-radius:10px;padding:14px;margin-bottom:16px;color:var(--text)}
+.banner .ascii{color:var(--accent);font-weight:700;white-space:pre;font-size:12px;line-height:1.2}
+label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px;text-transform:uppercase;letter-spacing:.15em}
+input[type=text],input[type=url],input[type=number],input[type=datetime-local]{width:100%;background:#050a08;color:var(--accent2);border:1px solid var(--border);border-radius:6px;padding:9px 10px;font-family:inherit;font-size:13px}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,255,157,.15)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+button{background:#05220e;color:var(--accent);border:1px solid #1f7a4a;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:800;cursor:pointer;margin-top:12px;text-transform:uppercase;letter-spacing:.12em}
+button:hover{background:#0a3318;box-shadow:0 0 0 2px rgba(0,255,157,.25)}
+button.sec{background:#1a1510;color:var(--warn);border-color:#3f2f10}
+button.sec:hover{background:#2a2010}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th,td{text-align:left;padding:9px 6px;border-bottom:1px solid #143028}
+th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.15em}
+.rank{font-weight:900;color:var(--accent);font-size:18px;min-width:26px;text-align:center;text-shadow:0 0 6px rgba(0,255,157,.35)}
+.handle{font-weight:800;color:#fff}
+.pill{display:inline-block;background:#05220e;border:1px solid #1f7a4a;color:var(--accent);padding:2px 8px;border-radius:999px;font-size:11px;letter-spacing:.1em}
+.alert{padding:10px 12px;border-radius:8px;margin-bottom:12px;border:1px solid}
+.alert.error{background:#1f080e;color:#ffb3bf;border-color:#5a1d2a}
+.alert.ok{background:#081f14;color:#a3f0b5;border-color:#1f5a35}
+.termline{white-space:nowrap;overflow:hidden}
+.blink{animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+</style>
+<div class="wrap">
+  <div class="brand">
+    <img src="/bankr-shilling/static/bankr-logo.svg" alt="Bankr"/>
+    <div>
+      <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="bright">~</span><span class="dim">$</span> <span class="cmd">neofetch</span></div>
+      <div class="dim" style="font-size:12px">shill_tracker // base_mainnet</div>
+    </div>
+  </div>
+
+  <div class="banner">
+    <div class="ascii">
+██████╗  █████╗ ██████╗ ██╗██╗   ██╗
+██╔══██╗██╔══██╗██╔══██╗██║██║   ██║
+██████╔╝███████║██████╔╝██║██║   ██║
+██╔══██╗██╔══██║██╔══██╗██║╚██╗ ██╔╝
+██║  ██║██║  ██║██████╔╝██║ ╚████╔╝ 
+╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═══╝  
+    </div>
+    <div style="margin-top:10px">
+      <span class="bright">>> MISSION: SHILL BANKR. GET PAID. WRITE HISTORY.</span> <span class="blink">_</span>
+    </div>
+    <div class="dim" style="margin-top:6px">submit bankr $BNKR tweets. climb the ledger. top 10 shillers claim the daily payout.</div>
+  </div>
+
+  <div id="alerts"></div>
+
+  <nav style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <a href="#leaderboard"><span class="prompt">~/leaderboard</span></a>
+    <a href="#tweets"><span class="prompt">~/tweets</span></a>
+    <a href="#payments"><span class="prompt">~/payments</span></a>
+  </nav>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="bright">~</span><span class="dim">$</span> <span class="cmd">submit_shill --help</span></div>
+        <form id="submitForm" style="margin-top:12px">
+          <label>x handle</label>
+          <input id="handle" placeholder="handle without @" required/>
+          <label style="margin-top:10px">tweet url</label>
+          <input id="tweetUrl" placeholder="https://x.com/handle/status/123..." required/>
+          <label style="margin-top:10px">posted at</label>
+          <input type="datetime-local" id="enteredAt"/>
+          <div class="row">
+            <div><label>likes</label><input type="number" id="likes" value="0" min="0"/></div>
+            <div><label>retweets</label><input type="number" id="retweets" value="0" min="0"/></div>
+            <div><label>replies</label><input type="number" id="replies" value="0" min="0"/></div>
+            <div><label>quotes</label><input type="number" id="quotes" value="0" min="0"/></div>
+            <div><label>views</label><input type="number" id="views" value="0" min="0"/></div>
+          </div>
+          <button type="submit">[ submit entry ]</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card" id="leaderboard">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="bright">~</span><span class="dim">$</span> <span class="cmd">rank --top=10</span></div>
+        <span class="dim" style="font-size:12px">composite score</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th style="width:40px">#</th><th>shiller</th><th>tw</th><th>likes</th><th>rts</th><th>replies</th><th>er%</th><th>score</th><th></th></tr>
+        </thead>
+        <tbody id="leaderboardBody">
+          <tr><td colspan="9" class="dim" style="text-align:center;padding:18px">no shills logged. submit a bankr $BNKR tweet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="tweets" style="margin-top:14px">
+    <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="bright">~</span><span class="dim">$</span> <span class="cmd">grep shills --latest=200</span></div>
+    <table style="margin-top:10px">
+      <thead>
+        <tr><th>Handle</th><th>Tweet ID</th><th>Likes</th><th>RTs</th><th>Replies</th><th>Quotes</th><th>Views</th><th>Entered at</th><th>Link</th></tr>
+      </thead>
+      <tbody id="tweetsBody">
+        <tr><td colspan="9" class="dim" style="text-align:center;padding:18px">no entries yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" id="payments" style="margin-top:14px">
+    <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="bright">~</span><span class="dim">$</span> <span class="cmd">manual_payout --config</span></div>
+    <form id="payoutForm" style="margin-top:12px">
+      <div class="row">
+        <div><label>date</label><input type="date" id="payoutDate" required/></div>
+        <div><label>rank 1-10</label><input type="number" id="payoutRank" min="1" max="10" required style="width:100px"/></div>
+        <div><label>handle</label><input id="payoutHandle" placeholder="@handle" required style="width:170px"/></div>
+        <div><label>amount usd</label><input type="number" step="0.01" id="payoutAmount" placeholder="0.00" required style="width:130px"/></div>
+        <div><label>note</label><input id="payoutNote" placeholder="optional" style="flex:1;min-width:180px"/></div>
+      </div>
+      <button type="submit" style="margin-top:10px">[ save payout ]</button>
+    </form>
+    <table style="margin-top:12px">
+      <thead>
+        <tr><th>date</th><th>rank</th><th>shiller</th><th>amount usd</th><th>note</th></tr>
+      </thead>
+      <tbody id="payoutsBody">
+        <tr><td colspan="5" class="dim" style="text-align:center;padding:18px">no payouts yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const LS_KEY = 'bankr_shill_data_v1';
+const LS_PAYOUTS = 'bankr_shill_payouts_v1';
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveData(data) { localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+
+function loadPayouts() {
+  try { return JSON.parse(localStorage.getItem(LS_PAYOUTS) || '[]'); } catch(e) { return []; }
+}
+function savePayouts(data) { localStorage.setItem(LS_PAYOUTS, JSON.stringify(data)); }
+
+function extractTweetId(url) {
+  url = (url || '').trim();
+  const m = url.match(/(?:twitter\.com|x\.com)\/[^/]+\/status\/(\d+)/);
+  return m ? m[1] : null;
+}
+
+function computeScore(likes, retweets, replies, views, quotes=0, ageHours=1) {
+  if (views <= 0) views = Math.max(likes + retweets + replies, 1);
+  const raw = likes + 2*retweets + replies*1.5 + quotes*2;
+  const logRaw = Math.log1p(raw);
+  const engagementRate = raw / views;
+  const quality = Math.pow(engagementRate, 0.5) * (1 + Math.min(replies, 50) / 100);
+  const agePenalty = 1 / (1 + ageHours / 24);
+  const score = (0.6*logRaw + 0.25*quality + 0.15*(views > 500 ? 1 : views/500)) * agePenalty * 100;
+  return Math.round(score * 10000) / 10000;
+}
+
+function alert(msg, type='ok') {
+  const el = document.getElementById('alerts');
+  el.innerHTML = `<div class="alert ${type}">[${type === 'ok' ? 'OK' : 'ERR'}] ${msg}</div>`;
+  setTimeout(() => el.innerHTML = '', 3000);
+}
+
+function renderAll() {
+  const data = loadData();
+  const payouts = loadPayouts();
+
+  // Aggregate by user
+  const users = {};
+  data.forEach(t => {
+    if (!users[t.handle]) users[t.handle] = { handle: t.handle, tweets: [], total: { likes:0, retweets:0, replies:0, views:0 } };
+    users[t.handle].tweets.push(t);
+    users[t.handle].total.likes += t.likes;
+    users[t.handle].total.retweets += t.retweets;
+    users[t.handle].total.replies += t.replies;
+    users[t.handle].total.views += t.views;
+  });
+
+  const enriched = Object.values(users).map(u => {
+    const t = u.total;
+    const latest = u.tweets.reduce((a,b) => a.enteredAt > b.enteredAt ? a : b);
+    const ageHours = Math.max((Date.now() - latest.enteredAt) / 3600000, 0.1);
+    const score = computeScore(t.likes, t.retweets, t.replies, t.views, 0, ageHours);
+    const er = t.views > 0 ? ((t.likes + 2*t.retweets + 1.5*t.replies) / t.views * 100) : 0;
+    return { handle: u.handle, tweet_count: u.tweets.length, ...t, score, avg_er: Math.round(er*1000)/1000, latest: latest.enteredAt };
+  });
+
+  enriched.sort((a,b) => b.score - a.score);
+  const top10 = enriched.slice(0, 10);
+
+  const ldb = document.getElementById('leaderboardBody');
+  if (top10.length === 0) {
+    ldb.innerHTML = `<tr><td colspan="9" class="dim" style="text-align:center;padding:18px">no shills logged. submit a bankr $BNKR tweet.</td></tr>`;
+  } else {
+    ldb.innerHTML = top10.map((r,i) => `
+      <tr>
+        <td class="rank">${i+1}</td>
+        <td><div class="handle">@${r.handle}</div></td>
+        <td>${r.tweet_count}</td>
+        <td>${r.total_likes}</td>
+        <td>${r.total_retweets}</td>
+        <td>${r.total_replies}</td>
+        <td><span class="pill">${r.avg_er}%</span></td>
+        <td><b>${Math.round(r.score)}</b></td>
+        <td>
+          <button class="sec" onclick="purge('${r.handle}')" style="padding:5px 9px;font-size:11px">[ purge ]</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  const tw = document.getElementById('tweetsBody');
+  if (data.length === 0) {
+    tw.innerHTML = `<tr><td colspan="9" class="dim" style="text-align:center;padding:18px">no entries yet.</td></tr>`;
+  } else {
+    data.sort((a,b) => b.enteredAt - a.enteredAt);
+    tw.innerHTML = data.slice(0,200).map(t => `
+      <tr>
+        <td>@${t.handle}</td>
+        <td class="dim">${t.tweetId || 'unknown'}</td>
+        <td>${t.likes}</td>
+        <td>${t.retweets}</td>
+        <td>${t.replies}</td>
+        <td>${t.quotes}</td>
+        <td>${t.views}</td>
+        <td class="dim">${new Date(t.enteredAt).toISOString().replace('T',' ').substring(0,19)}</td>
+        <td><a href="${t.tweetUrl}" target="_blank">[open ↗]</a></td>
+      </tr>
+    `).join('');
+  }
+
+  const pw = document.getElementById('payoutsBody');
+  if (payouts.length === 0) {
+    pw.innerHTML = `<tr><td colspan="5" class="dim" style="text-align:center;padding:18px">no payouts yet.</td></tr>`;
+  } else {
+    payouts.sort((a,b) => b.date.localeCompare(a.date) || a.rank - b.rank);
+    pw.innerHTML = payouts.map(p => `
+      <tr>
+        <td>${p.date}</td>
+        <td>${p.rank}</td>
+        <td>@${p.handle}</td>
+        <td>$${parseFloat(p.amount).toFixed(2)}</td>
+        <td class="dim">${p.note || ''}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+function purge(handle) {
+  if (!confirm(`Purge @${handle} from ledger?`)) return;
+  let data = loadData();
+  data = data.filter(t => t.handle !== handle);
+  saveData(data);
+  renderAll();
+  alert(`Purged @${handle}`, 'ok');
+}
+
+document.getElementById('submitForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const handle = document.getElementById('handle').value.trim().replace(/^@/,'');
+  const tweetUrl = document.getElementById('tweetUrl').value.trim();
+  const enteredAtRaw = document.getElementById('enteredAt').value;
+  const likes = parseInt(document.getElementById('likes').value || '0', 10);
+  const retweets = parseInt(document.getElementById('retweets').value || '0', 10);
+  const replies = parseInt(document.getElementById('replies').value || '0', 10);
+  const quotes = parseInt(document.getElementById('quotes').value || '0', 10);
+  const views = parseInt(document.getElementById('views').value || '0', 10);
+
+  if (!handle || !tweetUrl) { alert('Missing handle or tweet URL', 'error'); return; }
+  const tweetId = extractTweetId(tweetUrl);
+  if (!tweetId) { alert('Could not parse tweet ID from URL', 'error'); return; }
+
+  const enteredAt = enteredAtRaw ? new Date(enteredAtRaw).getTime() : Date.now();
+  const ageHours = Math.max((Date.now() - enteredAt) / 3600000, 0.1);
+
+  const data = loadData();
+  const existingIdx = data.findIndex(t => t.tweetId === tweetId);
+  const entry = { tweetId, handle, tweetUrl, enteredAt, likes, retweets, replies, quotes, views };
+
+  if (existingIdx >= 0) {
+    data[existingIdx] = entry;
+  } else {
+    data.push(entry);
+  }
+  saveData(data);
+  alert(`Inserted tweet for @${handle}`, 'ok');
+  e.target.reset();
+  renderAll();
+});
+
+document.getElementById('payoutForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const payout = {
+    date: document.getElementById('payoutDate').value,
+    rank: parseInt(document.getElementById('payoutRank').value, 10),
+    handle: document.getElementById('payoutHandle').value.trim().replace(/^@/,''),
+    amount: parseFloat(document.getElementById('payoutAmount').value || '0'),
+    note: document.getElementById('payoutNote').value.trim()
+  };
+  if (!payout.date || !payout.rank || !payout.handle || !payout.amount) {
+    alert('date, rank, handle, and amount are required', 'error'); return;
+  }
+  const payouts = loadPayouts();
+  payouts.push(payout);
+  savePayouts(payouts);
+  alert('Saved payout', 'ok');
+  e.target.reset();
+  document.getElementById('payoutDate').value = new Date().toISOString().slice(0,10);
+  renderAll();
+});
+
+document.getElementById('payoutDate').value = new Date().toISOString().slice(0,10);
+renderAll();
+</script>

@@ -1,0 +1,41 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.1.8:8080
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [24/Jun/2026 13:13:48] "GET /health HTTP/1.1" 200 -
+/data/data/com.termux/files/home/bankr-shilling/app.py:136: DeprecationWarning: The default timestamp converter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  user_row = db.execute("SELECT * FROM users WHERE lower(x_handle)=lower(?)", (handle,)).fetchone()
+/data/data/com.termux/files/home/bankr-shilling/app.py:150: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  db.execute(
+127.0.0.1 - - [24/Jun/2026 13:13:57] "[32mPOST / HTTP/1.1[0m" 302 -
+/data/data/com.termux/files/home/bankr-shilling/app.py:186: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  rows = db.execute(
+127.0.0.1 - - [24/Jun/2026 13:17:33] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 13:17:34] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [24/Jun/2026 13:17:48] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 13:18:32] "GET / HTTP/1.1" 200 -
+/data/data/com.termux/files/home/bankr-shilling/app.py:259: DeprecationWarning: The default timestamp converter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+  ).fetchall()
+[2026-06-24 13:19:14,265] ERROR in app: Exception on /tweets [GET]
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/data/data/com.termux/files/usr/lib/python3.13/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/home/bankr-shilling/app.py", line 259, in tweets_view
+    ).fetchall()
+      ~~~~~~~~^^
+  File "/data/data/com.termux/files/usr/lib/python3.13/sqlite3/dbapi2.py", line 77, in convert_timestamp
+    datepart, timepart = val.split(b" ")
+    ^^^^^^^^^^^^^^^^^^
+ValueError: not enough values to unpack (expected 2, got 1)
+127.0.0.1 - - [24/Jun/2026 13:19:14] "[35m[1mGET /tweets HTTP/1.1[0m" 500 -
+127.0.0.1 - - [24/Jun/2026 13:20:30] "GET /health HTTP/1.1" 200 -

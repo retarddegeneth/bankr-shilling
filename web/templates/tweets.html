@@ -1,0 +1,67 @@
+<!doctype html>
+<title>Tweets — Bankr Shill Terminal</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+:root{--bg:#030506;--panel:#0a0f0d;--accent:#00ff9d;--accent2:#78ffd6;--muted:#5a7a72;--text:#c9f0d8;--border:#1a3a2f;--err:#ff4d6a;--warn:#f2b518;--ok:#3fb950;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Courier New",Courier,monospace;font-size:15px;line-height:1.55}
+.wrap{max-width:1140px;margin:0 auto;padding:22px}
+.prompt{color:var(--accent);font-weight:700}
+.cmd{color:var(--accent2)}
+.dim{color:var(--muted)}
+a{color:var(--accent2);text-decoration:underline}
+nav{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.term::before{content:"";display:block;height:10px;margin-bottom:10px;border-bottom:1px solid var(--border);opacity:.6}
+.toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.toolbar form{display:flex;gap:8px;flex:1;min-width:320px}
+input[type=text]{background:#050a08;color:var(--accent2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-family:inherit;font-size:13px;flex:1}
+button{background:#05220e;color:var(--accent);border:1px solid #1f7a4a;border-radius:8px;padding:8px 12px;font-family:inherit;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.12em;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #143028}
+th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.15em}
+</style>
+<div class="wrap">
+  <nav>
+    <a href="/"><span class="prompt">~/leaderboard</span></a>
+    <a href="/tweets"><span class="prompt">~/tweets</span></a>
+    <a href="/payments"><span class="prompt">~/payments</span></a>
+  </nav>
+  <div class="card">
+    <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="cmd">~</span><span class="dim">$</span> <span class="cmd">grep shills --latest=200</span></div>
+  </div>
+  <div class="toolbar">
+    <form method="get" action="/tweets">
+      <input type="text" name="q" placeholder="search url or id…" value="{{ q or '' }}"/>
+      <button type="submit">[ find ]</button>
+    </form>
+    {% if user_id %}
+      <a href="/tweets" class="dim">clear filter</a>
+    {% endif %}
+  </div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th>Handle</th><th>Tweet ID</th><th>Likes</th><th>RTs</th><th>Replies</th><th>Quotes</th><th>Views</th><th>Entered at</th><th>Link</th></tr>
+      </thead>
+      <tbody>
+        {% for t in tweets %}
+          <tr>
+            <td>@{{ t.x_handle }}</td>
+            <td class="dim">{{ t.tweet_id }}</td>
+            <td>{{ t.likes }}</td>
+            <td>{{ t.retweets }}</td>
+            <td>{{ t.replies }}</td>
+            <td>{{ t.quote_count }}</td>
+            <td>{{ t.views }}</td>
+            <td class="dim">{{ t.entered_at }}</td>
+            <td><a href="{{ t.tweet_url }}" target="_blank">[open ↗]</a></td>
+          </tr>
+        {% else %}
+          <tr><td colspan="9" class="dim" style="text-align:center;padding:18px">no entries yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

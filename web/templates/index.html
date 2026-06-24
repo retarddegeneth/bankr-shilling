@@ -1,0 +1,145 @@
+<!doctype html>
+<title>Bankr Shill Terminal v1.0</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+:root{--bg:#030506;--panel:#0a0f0d;--accent:#00ff9d;--accent2:#78ffd6;--muted:#5a7a72;--text:#c9f0d8;--border:#1a3a2f;--err:#ff4d6a;--warn:#f2b518;--ok:#3fb950;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:"Courier New",Courier,monospace;font-size:15px;line-height:1.55}
+.wrap{max-width:1140px;margin:0 auto;padding:22px}
+.term{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:14px;position:relative;box-shadow:0 0 0 1px #0f1f18 inset}
+.term::before{content:"";position:absolute;top:0;left:0;right:0;height:28px;background:#0e1a16;border-bottom:1px solid var(--border);border-radius:8px 8px 0 0}
+.term::after{content:"● ● ●";position:absolute;top:5px;left:12px;color:#2a5a4a;font-size:11px;letter-spacing:2px}
+h1{font-size:16px;margin:0;color:var(--accent);font-weight:700}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.brand img{height:40px;width:40px;image-rendering:pixelated;filter:drop-shadow(0 0 8px rgba(0,255,157,.35))}
+.prompt{color:var(--accent);font-weight:700}
+.cmd{color:var(--accent2)}
+.bright{color:#fff;text-shadow:0 0 6px rgba(0,255,157,.25)}
+.dim{color:var(--muted)}
+.err{color:var(--err)}
+.warn{color:var(--warn)}
+.ok{color:var(--ok)}
+a{color:var(--accent2);text-decoration:underline}
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:960px){.grid{grid-template-columns:380px 1fr}}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:14px}
+.banner{background:#081f18;border:1px solid #1f5f44;border-radius:10px;padding:14px;margin-bottom:16px;color:var(--text)}
+.banner .ascii{color:var(--accent);font-weight:700;white-space:pre;font-size:12px;line-height:1.2}
+label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px;text-transform:uppercase;letter-spacing:.15em}
+input[type=text],input[type=url],input[type=number],input[type=datetime-local]{width:100%;background:#050a08;color:var(--accent2);border:1px solid var(--border);border-radius:6px;padding:9px 10px;font-family:inherit;font-size:13px}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,255,157,.15)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+button{background:#05220e;color:var(--accent);border:1px solid #1f7a4a;border-radius:8px;padding:9px 14px;font-family:inherit;font-weight:800;cursor:pointer;margin-top:12px;text-transform:uppercase;letter-spacing:.12em}
+button:hover{background:#0a3318;box-shadow:0 0 0 2px rgba(0,255,157,.25)}
+button.sec{background:#1a1510;color:var(--warn);border-color:#3f2f10}
+button.sec:hover{background:#2a2010}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th,td{text-align:left;padding:9px 6px;border-bottom:1px solid #143028}
+th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.15em}
+.rank{font-weight:900;color:var(--accent);font-size:18px;min-width:26px;text-align:center;text-shadow:0 0 6px rgba(0,255,157,.35)}
+.handle{font-weight:800;color:#fff}
+.pill{display:inline-block;background:#05220e;border:1px solid #1f7a4a;color:var(--accent);padding:2px 8px;border-radius:999px;font-size:11px;letter-spacing:.1em}
+.alert{padding:10px 12px;border-radius:8px;margin-bottom:12px;border:1px solid}
+.alert.error{background:#1f080e;color:#ffb3bf;border-color:#5a1d2a}
+.alert.ok{background:#081f14;color:#a3f0b5;border-color:#1f5a35}
+.termline{white-space:nowrap;overflow:hidden}
+.blink{animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+</style>
+<div class="wrap">
+  <div class="brand">
+    <img src="/static/bankr-logo.svg" alt="Bankr"/>
+    <div>
+      <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="bright">~</span><span class="dim">$</span> <span class="cmd">neofetch</span></div>
+      <div class="dim" style="font-size:12px">shill_tracker // base_mainnet</div>
+    </div>
+  </div>
+
+  <div class="banner">
+    <div class="ascii">
+██████╗  █████╗ ██████╗ ██╗██╗   ██╗
+██╔══██╗██╔══██╗██╔══██╗██║██║   ██║
+██████╔╝███████║██████╔╝██║██║   ██║
+██╔══██╗██╔══██║██╔══██╗██║╚██╗ ██╔╝
+██║  ██║██║  ██║██████╔╝██║ ╚████╔╝ 
+╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═══╝  
+    </div>
+    <div style="margin-top:10px">
+      <span class="bright">>> MISSION: SHILL BANKR. GET PAID. WRITE HISTORY.</span> <span class="blink">_</span>
+    </div>
+    <div class="dim" style="margin-top:6px">submit bankr $BNKR tweets. climb the ledger. top 10 shillers claim the daily payout.</div>
+  </div>
+
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+      {% for cat, msg in msgs %}
+        <div class="alert {{ 'ok' if cat=='success' else 'error' }}">[{{ 'OK' if cat=='success' else 'ERR' }}] {{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <nav style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <a href="/"><span class="prompt">~/leaderboard</span></a>
+    <a href="/tweets"><span class="prompt">~/tweets</span></a>
+    <a href="/payments"><span class="prompt">~/payments</span></a>
+  </nav>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="bright">~</span><span class="dim">$</span> <span class="cmd">submit_shill --help</span></div>
+        <form method="post" action="/" style="margin-top:12px">
+          <label>x handle</label>
+          <input name="x_handle" placeholder="handle without @" required/>
+          <label style="margin-top:10px">tweet url</label>
+          <input name="tweet_url" placeholder="https://x.com/handle/status/123..." required/>
+          <label style="margin-top:10px">posted at</label>
+          <input type="datetime-local" name="entered_at"/>
+          <div class="row">
+            <div><label>likes</label><input type="number" name="likes" value="0" min="0"/></div>
+            <div><label>retweets</label><input type="number" name="retweets" value="0" min="0"/></div>
+            <div><label>replies</label><input type="number" name="replies" value="0" min="0"/></div>
+            <div><label>quotes</label><input type="number" name="quote_count" value="0" min="0"/></div>
+            <div><label>views</label><input type="number" name="views" value="0" min="0"/></div>
+          </div>
+          <button type="submit">[ submit entry ]</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div class="termline"><span class="prompt">guest@bankr-shill</span><span class="dim">:</span><span class="bright">~</span><span class="dim">$</span> <span class="cmd">rank --top=10</span></div>
+        <span class="dim" style="font-size:12px">composite score</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th style="width:40px">#</th><th>shiller</th><th>tw</th><th>likes</th><th>rts</th><th>replies</th><th>er%</th><th>score</th><th></th></tr>
+        </thead>
+        <tbody>
+        {% for row in leaderboard %}
+          <tr>
+            <td class="rank">{{ row.rank }}</td>
+            <td><div class="handle">@{{ row.x_handle }}</div></td>
+            <td>{{ row.tweet_count }}</td>
+            <td>{{ row.total_likes }}</td>
+            <td>{{ row.total_retweets }}</td>
+            <td>{{ row.total_replies }}</td>
+            <td><span class="pill">{{ row.avg_er }}%</span></td>
+            <td><b>{{ row.score }}</b></td>
+            <td>
+              <form method="post" action="/delete_user" style="margin:0" onsubmit="return confirm('Purge @{{ row.x_handle }} from ledger?')">
+                <input type="hidden" name="user_id" value="{{ row.id }}"/>
+                <button type="submit" class="sec" style="padding:5px 9px;font-size:11px">[ purge ]</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="9" class="dim" style="text-align:center;padding:18px">no shills logged. submit a bankr $BNKR tweet.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
